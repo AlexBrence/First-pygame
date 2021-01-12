@@ -6,13 +6,15 @@ win = pygame.display.set_mode((500, 480))  # width, height
 pygame.display.set_caption("First Game")
 font = pygame.font.SysFont("comicsans", 30, True)
 
-walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]
-walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
-bg = pygame.image.load('bg.jpg')
-char = pygame.image.load('standing.png')
+walkRight = [pygame.image.load('media/R1.png'), pygame.image.load('media/R2.png'), pygame.image.load('media/R3.png'), pygame.image.load('media/R4.png'), pygame.image.load('media/R5.png'), pygame.image.load('media/R6.png'), pygame.image.load('media/R7.png'), pygame.image.load('media/R8.png'), pygame.image.load('media/R9.png')]
+walkLeft = [pygame.image.load('media/L1.png'), pygame.image.load('media/L2.png'), pygame.image.load('media/L3.png'), pygame.image.load('media/L4.png'), pygame.image.load('media/L5.png'), pygame.image.load('media/L6.png'), pygame.image.load('media/L7.png'), pygame.image.load('media/L8.png'), pygame.image.load('media/L9.png')]
+bg = pygame.image.load('media/bg.jpg')
+char = pygame.image.load('media/standing.png')
 
 clock = pygame.time.Clock()
 
+
+""" CLASSES """
 
 class Player(object):
     def __init__(self, x, y, width, height):
@@ -71,8 +73,8 @@ class Projectile(object):
 
 
 class Enemy(object):
-    walkRight = [pygame.image.load('R1E.png'), pygame.image.load('R2E.png'), pygame.image.load('R3E.png'), pygame.image.load('R4E.png'), pygame.image.load('R5E.png'), pygame.image.load('R6E.png'), pygame.image.load('R7E.png'), pygame.image.load('R8E.png'), pygame.image.load('R9E.png'), pygame.image.load('R10E.png'), pygame.image.load('R11E.png')]
-    walkLeft = [pygame.image.load('L1E.png'), pygame.image.load('L2E.png'), pygame.image.load('L3E.png'), pygame.image.load('L4E.png'), pygame.image.load('L5E.png'), pygame.image.load('L6E.png'), pygame.image.load('L7E.png'), pygame.image.load('L8E.png'), pygame.image.load('L9E.png'), pygame.image.load('L10E.png'), pygame.image.load('L11E.png')]
+    walkRight = [pygame.image.load('media/R1E.png'), pygame.image.load('media/R2E.png'), pygame.image.load('media/R3E.png'), pygame.image.load('media/R4E.png'), pygame.image.load('media/R5E.png'), pygame.image.load('media/R6E.png'), pygame.image.load('media/R7E.png'), pygame.image.load('media/R8E.png'), pygame.image.load('media/R9E.png'), pygame.image.load('media/R10E.png'), pygame.image.load('media/R11E.png')]
+    walkLeft = [pygame.image.load('media/L1E.png'), pygame.image.load('media/L2E.png'), pygame.image.load('media/L3E.png'), pygame.image.load('media/L4E.png'), pygame.image.load('media/L5E.png'), pygame.image.load('media/L6E.png'), pygame.image.load('media/L7E.png'), pygame.image.load('media/L8E.png'), pygame.image.load('media/L9E.png'), pygame.image.load('media/L10E.png'), pygame.image.load('media/L11E.png')]
 
     def __init__(self, x, y, width, height, end):
         self.x = x
@@ -146,8 +148,18 @@ class Enemy(object):
 
 
 
+
+
 def keyPressed():
     global shootLoop
+    global run
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+
+    keys = pygame.key.get_pressed()
 
     if keys[pygame.K_SPACE] and shootLoop == 0:
         if man.left:
@@ -198,6 +210,35 @@ def keyPressed():
 
 
 
+
+""" FUNCTIONS """
+
+def shootingLoop():
+    global shootLoop
+
+    if shootLoop > 0:
+        shootLoop += 1
+    if shootLoop > 3:
+        shootLoop = 0
+
+
+
+def shooting():
+    for bullet in bullets:
+        goblin_got_hit = (bullet.x > goblin.x and bullet.x < goblin.x + goblin.width) and (bullet.y > goblin.y and bullet.y < goblin.y + goblin.height)
+
+        if goblin_got_hit and goblin.visible: 
+                goblin.hit()
+                bullets.pop(bullets.index(bullet))
+
+        if bullet.x < 500 and bullet.x > 0:
+            bullet.x += bullet.vel
+
+        else:
+            bullets.pop(bullets.index(bullet))    # We don't need to have a bullet that is off the screen so we are finding it and deleting it.
+
+
+
 def redrawGameWindow():
     win.blit(bg, (0, 0))
 
@@ -224,41 +265,16 @@ shootLoop = 0
 goblin = Enemy(100, 420, 64, 64, 300)
 run = True
 
-# mainloop
+""" MAINLOOP """
 while run:
     clock.tick(27)
     
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-
-    if shootLoop > 0:
-        shootLoop += 1
-    if shootLoop > 3:
-        shootLoop = 0
-
-
-    for bullet in bullets:
-        goblin_got_hit = (bullet.x > goblin.x and bullet.x < goblin.x + goblin.width) and (bullet.y > goblin.y and bullet.y < goblin.y + goblin.height)
-
-        if goblin_got_hit and goblin.visible: 
-                goblin.hit()
-                bullets.pop(bullets.index(bullet))
-
-        if bullet.x < 500 and bullet.x > 0:
-            bullet.x += bullet.vel
-
-        else:
-            bullets.pop(bullets.index(bullet))    # We don't need to have a bullet that is off the screen so we are finding it and deleting it.
-
-    keys = pygame.key.get_pressed()
+    shootingLoop()
+    shooting()
     keyPressed()
     
+
     redrawGameWindow()
             
-
-
-
-
 
 pygame.quit()
