@@ -1,17 +1,27 @@
 import pygame
 pygame.init()
 
+""" WINDOW and FONT """
 win = pygame.display.set_mode((500, 480))  # width, height 
-
 pygame.display.set_caption("First Game")
 font = pygame.font.SysFont("comicsans", 30, True)
-
-walkRight = [pygame.image.load('media/R1.png'), pygame.image.load('media/R2.png'), pygame.image.load('media/R3.png'), pygame.image.load('media/R4.png'), pygame.image.load('media/R5.png'), pygame.image.load('media/R6.png'), pygame.image.load('media/R7.png'), pygame.image.load('media/R8.png'), pygame.image.load('media/R9.png')]
-walkLeft = [pygame.image.load('media/L1.png'), pygame.image.load('media/L2.png'), pygame.image.load('media/L3.png'), pygame.image.load('media/L4.png'), pygame.image.load('media/L5.png'), pygame.image.load('media/L6.png'), pygame.image.load('media/L7.png'), pygame.image.load('media/L8.png'), pygame.image.load('media/L9.png')]
-bg = pygame.image.load('media/bg.jpg')
-char = pygame.image.load('media/standing.png')
-
 clock = pygame.time.Clock()
+
+""" SPRITES and MUSIC """
+walkRight = [pygame.image.load('media/pics/R1.png'), pygame.image.load('media/pics/R2.png'), pygame.image.load('media/pics/R3.png'), pygame.image.load('media/pics/R4.png'), pygame.image.load('media/pics/R5.png'), pygame.image.load('media/pics/R6.png'), pygame.image.load('media/pics/R7.png'), pygame.image.load('media/pics/R8.png'), pygame.image.load('media/pics/R9.png')]
+walkLeft = [pygame.image.load('media/pics/L1.png'), pygame.image.load('media/pics/L2.png'), pygame.image.load('media/pics/L3.png'), pygame.image.load('media/pics/L4.png'), pygame.image.load('media/pics/L5.png'), pygame.image.load('media/pics/L6.png'), pygame.image.load('media/pics/L7.png'), pygame.image.load('media/pics/L8.png'), pygame.image.load('media/pics/L9.png')]
+bg = pygame.image.load('media/pics/bg.jpg')
+char = pygame.image.load('media/pics/standing.png')
+
+music_bullet = pygame.mixer.Sound('media/music/bullet.wav')
+music_hit = pygame.mixer.Sound('media/music/hit.wav')
+music_enemy_dies = pygame.mixer.Sound('media/music/enemy_dies.wav')
+music_jump = pygame.mixer.Sound('media/music/jump.wav')
+music = pygame.mixer.music.load('media/music/music.wav')
+pygame.mixer.music.play(-1)     # -1 so the song keeps looping
+
+
+
 
 
 """ CLASSES """
@@ -25,7 +35,7 @@ class Player(object):
         self.vel = 5
         self.isJump = False
         self.jumpCount = 10
-        self.left = False
+        self.left = True
         self.right = False
         self.walkCount = 0
         self.standing = True
@@ -53,7 +63,6 @@ class Player(object):
                 win.blit(walkLeft[0], (self.x, self.y))
 
         self.hitbox = (self.x + 18, self.y + 12, 26, 50)
-        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
         
 
 
@@ -72,9 +81,10 @@ class Projectile(object):
 
 
 
+
 class Enemy(object):
-    walkRight = [pygame.image.load('media/R1E.png'), pygame.image.load('media/R2E.png'), pygame.image.load('media/R3E.png'), pygame.image.load('media/R4E.png'), pygame.image.load('media/R5E.png'), pygame.image.load('media/R6E.png'), pygame.image.load('media/R7E.png'), pygame.image.load('media/R8E.png'), pygame.image.load('media/R9E.png'), pygame.image.load('media/R10E.png'), pygame.image.load('media/R11E.png')]
-    walkLeft = [pygame.image.load('media/L1E.png'), pygame.image.load('media/L2E.png'), pygame.image.load('media/L3E.png'), pygame.image.load('media/L4E.png'), pygame.image.load('media/L5E.png'), pygame.image.load('media/L6E.png'), pygame.image.load('media/L7E.png'), pygame.image.load('media/L8E.png'), pygame.image.load('media/L9E.png'), pygame.image.load('media/L10E.png'), pygame.image.load('media/L11E.png')]
+    walkRight = [pygame.image.load('media/pics/R1E.png'), pygame.image.load('media/pics/R2E.png'), pygame.image.load('media/pics/R3E.png'), pygame.image.load('media/pics/R4E.png'), pygame.image.load('media/pics/R5E.png'), pygame.image.load('media/pics/R6E.png'), pygame.image.load('media/pics/R7E.png'), pygame.image.load('media/pics/R8E.png'), pygame.image.load('media/pics/R9E.png'), pygame.image.load('media/pics/R10E.png'), pygame.image.load('media/pics/R11E.png')]
+    walkLeft = [pygame.image.load('media/pics/L1E.png'), pygame.image.load('media/pics/L2E.png'), pygame.image.load('media/pics/L3E.png'), pygame.image.load('media/pics/L4E.png'), pygame.image.load('media/pics/L5E.png'), pygame.image.load('media/pics/L6E.png'), pygame.image.load('media/pics/L7E.png'), pygame.image.load('media/pics/L8E.png'), pygame.image.load('media/pics/L9E.png'), pygame.image.load('media/pics/L10E.png'), pygame.image.load('media/pics/L11E.png')]
 
     def __init__(self, x, y, width, height, end):
         self.x = x
@@ -112,7 +122,6 @@ class Enemy(object):
         else:
             self.hitbox = (0, 0, 0, 0) 
 
-        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
 
 
@@ -131,7 +140,7 @@ class Enemy(object):
                 self.walkCount += 1
             
             pygame.draw.rect(win, (255, 0, 0), (self.hitbox[0], self.hitbox[1] - 20, 50, 10))
-            pygame.draw.rect(win, (0, 128, 0), (self.hitbox[0], self.hitbox[1] - 20, 50 - (5 * (10 - self.health)), 10))
+            pygame.draw.rect(win, (0, 128, 0), (self.hitbox[0], self.hitbox[1] - 20, 52 - (5 * (10 - self.health)), 10))
             self.hitbox = (self.x + 17, self.x + 2, 32, 57)
 
 
@@ -140,15 +149,18 @@ class Enemy(object):
     def hit(self):
         global score
         score += 1
+        music_hit.play()
 
         if self.health > 0:
             self.health -= 1
         else:
+            music_enemy_dies.play()
             self.visible = False
 
 
 
 
+""" FUNCTIONS """
 
 def keyPressed():
     global shootLoop
@@ -162,6 +174,8 @@ def keyPressed():
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_SPACE] and shootLoop == 0:
+        music_bullet.play()
+
         if man.left:
             facing = -1
         else:
@@ -192,6 +206,7 @@ def keyPressed():
     if not (man.isJump):
 
         if keys[pygame.K_UP]:
+            music_jump.play()
             man.isJump = True
             man.walkCount = 0
 
@@ -201,7 +216,7 @@ def keyPressed():
 
             if man.jumpCount < 0:
                 neg = -1
-            man.y -= (man.jumpCount ** 2) * 0.5 * neg     # ** is squared
+            man.y -= (man.jumpCount ** 2) * 0.2 * neg     # ** is squared
             man.jumpCount -= 1
 
         else:
@@ -211,7 +226,6 @@ def keyPressed():
 
 
 
-""" FUNCTIONS """
 
 def shootingLoop():
     global shootLoop
@@ -223,13 +237,15 @@ def shootingLoop():
 
 
 
+
 def shooting():
     for bullet in bullets:
         goblin_got_hit = (bullet.x > goblin.x and bullet.x < goblin.x + goblin.width) and (bullet.y > goblin.y and bullet.y < goblin.y + goblin.height)
+        
 
         if goblin_got_hit and goblin.visible: 
-                goblin.hit()
-                bullets.pop(bullets.index(bullet))
+            goblin.hit()
+            bullets.pop(bullets.index(bullet))
 
         if bullet.x < 500 and bullet.x > 0:
             bullet.x += bullet.vel
@@ -248,6 +264,7 @@ def redrawGameWindow():
 
     goblin.draw(win)
     text = font.render("Score: " + str(score), 1, (0, 0, 0))
+    win.blit(text, (390, 10))
 
     pygame.display.update()
 
@@ -269,9 +286,9 @@ run = True
 while run:
     clock.tick(27)
     
+    keyPressed()
     shootingLoop()
     shooting()
-    keyPressed()
     
 
     redrawGameWindow()
